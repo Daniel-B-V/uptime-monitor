@@ -1,0 +1,24 @@
+name: uptime
+
+# Runs on GitHub's infrastructure, so it keeps checking with your PC turned off.
+# A failed run emails you automatically -- that's the alerting.
+on:
+  schedule:
+    - cron: "*/5 * * * *"    # every 5 minutes (GitHub's floor; runs may be delayed)
+  workflow_dispatch:          # lets you trigger a run by hand from the Actions tab
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check sites are up
+        env:
+          CHECK_URLS: ${{ vars.CHECK_URLS }}
+        run: python uptime_check.py --url-file urls.txt
